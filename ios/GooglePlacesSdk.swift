@@ -80,7 +80,128 @@ class GooglePlacesSdk: NSObject {
       resolve(parsedSuggestions)
     })
   }
-  
+
+  @objc
+  func searchByText(
+    _ query: String,
+    filterOptions: NSDictionary,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    guard let client = self.client else {
+      reject("-1", NOT_INITIALIZED_MSG, NSError(domain: "", code: 0))
+      return
+    }
+
+    // Create or reuse session token
+    self.sessionToken = self.sessionToken ?? GMSAutocompleteSessionToken()
+
+    // Define all place properties to request
+    let properties: [String] = [
+      GMSPlaceProperty.addressComponents,
+      GMSPlaceProperty.name,
+      GMSPlaceProperty.coordinate,
+      GMSPlaceProperty.types,
+      GMSPlaceProperty.placeID,
+      GMSPlaceProperty.formattedAddress,
+      GMSPlaceProperty.website
+    ].map { $0.rawValue }
+
+    let request = GMSPlaceSearchByTextRequest(textQuery: query, placeProperties: properties);
+
+    // Perform the search
+    client.searchByText(with: request) { results, error in
+      if let error = error {
+        reject(String(error._code), error.localizedDescription, error)
+        return
+      }
+
+      guard let places = results else {
+        reject("0", "No results found", nil)
+        return
+      }
+
+      let mappedResults: [[String: Any]] = places.map { place in
+        var dict: [String: Any] = [:]
+        dict["placeId"] = place.placeID ?? ""
+        dict["name"] = place.name ?? ""
+        dict["formattedAddress"] = place.formattedAddress ?? ""
+        dict["types"] = place.types ?? []
+        dict["url"] = place.website ?? []
+        if let coordinate = place.coordinate as CLLocationCoordinate2D? {
+          dict["location"] = ["lat": coordinate.latitude, "lng": coordinate.longitude]
+        }
+
+        return dict
+      }
+
+      resolve(mappedResults)
+    }
+  }
+
+
+  @objc
+  func searchNearby(_ options: NSDictionary, includedTypes:[String],  resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+
+    guard let latitude = options["latitude"] as? Double,
+          let longitude = options["longitude"] as? Double,
+          let radius = options["radius"] as? Double else {
+      reject("INVALID_PARAMS", "Missing or invalid latitude/longitude/radius", nil)
+      return
+    }
+
+    guard let client = self.client else {
+      reject("-1", NOT_INITIALIZED_MSG, NSError(domain: "", code: 0))
+      return
+    }
+
+    let circularLocationRestriction = GMSPlaceCircularLocationOption(CLLocationCoordinate2DMake(latitude , longitude ), radius )
+
+    // Define all place properties to request
+    let placeProperties: [String] = [
+      GMSPlaceProperty.addressComponents,
+      GMSPlaceProperty.name,
+      GMSPlaceProperty.coordinate,
+      GMSPlaceProperty.types,
+      GMSPlaceProperty.placeID,
+      GMSPlaceProperty.formattedAddress,
+      GMSPlaceProperty.website
+    ].map { $0.rawValue }
+
+    var request = GMSPlaceSearchNearbyRequest(locationRestriction: circularLocationRestriction, placeProperties: placeProperties)
+
+    request.includedTypes = includedTypes;
+    // Perform the search
+    client.searchNearby(with: request) { results, error in
+      if let error = error {
+        reject(String(error._code), error.localizedDescription, error)
+        return
+      }
+
+      guard let places = results else {
+        reject("0", "No results found", nil)
+        return
+      }
+
+      let mappedResults: [[String: Any]] = places.map { place in
+        var dict: [String: Any] = [:]
+        dict["placeId"] = place.placeID ?? ""
+        dict["name"] = place.name ?? ""
+        dict["formattedAddress"] = place.formattedAddress ?? ""
+        dict["types"] = place.types ?? []
+        dict["url"] = place.website ?? []
+        if let coordinate = place.coordinate as CLLocationCoordinate2D? {
+          dict["location"] = ["lat": coordinate.latitude, "lng": coordinate.longitude]
+        }
+
+        return dict
+      }
+
+      resolve(mappedResults)
+    }
+
+  }
+
   @objc
   func fetchPlaceByID(_ placeID: String, fields: NSArray, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     guard let client = self.client else {

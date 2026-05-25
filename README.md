@@ -22,6 +22,10 @@ Google Places SDK for React Native. Places SDK allows you to build location awar
     - [Sample Implementation](#sample-implementation)
   - [Fetch Place By ID](#fetch-place-by-id)
     - [Sample Implementation](#sample-implementation-1)
+  - [Search By Text](#search-by-text)
+    - [Sample Implementation](#sample-implementation-2)
+  - [Search Nearby](#search-nearby)
+    - [Sample Implementation](#sample-implementation-3)
 - [Contributing](#contributing)
 - [Licence](#license)
 
@@ -30,7 +34,7 @@ Google Places SDK for React Native. Places SDK allows you to build location awar
 ### Minimum Platform Version
 
 - Android: 21
-- iOS: 13
+- iOS: 15
 
 ### Google Places API Key
 
@@ -196,6 +200,116 @@ GooglePlacesSDK.fetchPlaceByID(
 )
   .then((place) => console.log(place));
   .catch((error) => console.log(error));
+// ...
+```
+
+### Search By Text
+
+#### searchByText(query: string, filters?: PredictionFiltersParam): Promise\<PlacePrediction[]\>
+
+Searches for places using a free-form text query (e.g. "Pizza in Mumbai") and returns
+the matching places. Backed by the [Text Search](https://developers.google.com/maps/documentation/places/android-sdk/text-search)
+(New) endpoint. A session token is created automatically if one is not already active.
+
+> **Note:** This method requires the new Places API to be enabled for your API key.
+
+#### PredictionFiltersParams
+
+```ts
+type PredictionFiltersParam = {
+  types?: string[];
+  countries?: string[];
+  locationBias?: LocationBounds;
+  locationRestriction?: LocationBounds;
+  origin?: LatLng;
+};
+```
+
+#### Sample Output
+
+```json
+[
+  {
+    "name": "Trishna",
+    "placeID": "ChIJ-yRniTbO5zsRGFuFGRTTFCo",
+    "formattedAddress": "7, Rope Walk Ln, Kala Ghoda, Fort, Mumbai, Maharashtra 400001, India",
+    "location": { "lat": 18.927591, "lng": 72.832327 },
+    "types": ["restaurant", "food", "point_of_interest", "establishment"]
+  }
+]
+```
+
+> **Note:** The result shape differs slightly between platforms. iOS returns
+> `placeId`, `name`, `formattedAddress`, `types`, `url` and `location`, while Android
+> additionally returns `description`, `phoneNumber`, `websiteUri`, `coordinate` and
+> `addressComponents`. Read only the fields you need for cross-platform parity.
+
+#### Sample Implementation
+
+```ts
+import GooglePlacesSDK from 'react-native-google-places-sdk';
+
+GooglePlacesSDK.searchByText(
+  'Pizza in Mumbai', // query
+  { countries: ['in'] } // filters (optional)
+)
+  .then((places) => console.log(places))
+  .catch((error) => console.log(error));
+
+// ...
+```
+
+### Search Nearby
+
+#### searchNearby(options: { latitude: number; longitude: number; radius: number }, includedTypes?: string[]): Promise\<PlacePrediction[]\>
+
+Searches for places within a circular area defined by a center coordinate and a
+`radius` (in meters). Backed by the [Nearby Search](https://developers.google.com/maps/documentation/places/android-sdk/nearby-search)
+(New) endpoint. Optionally pass `includedTypes` to restrict results to specific
+[place types](https://developers.google.com/maps/documentation/places/web-service/supported_types)
+(e.g. `['restaurant', 'cafe']`).
+
+> **Note:** This method requires the new Places API to be enabled for your API key.
+
+#### Options
+
+```ts
+type SearchNearbyOptions = {
+  latitude: number;
+  longitude: number;
+  radius: number; // in meters
+};
+```
+
+#### Sample Output
+
+```json
+[
+  {
+    "name": "Leopold Cafe",
+    "placeID": "ChIJ7Qk5gjDG5zsRR4yQ7l4nQ8c",
+    "formattedAddress": "Colaba Causeway, Mumbai, Maharashtra 400001, India",
+    "location": { "lat": 18.922474, "lng": 72.831993 },
+    "types": ["cafe", "restaurant", "food", "point_of_interest", "establishment"]
+  }
+]
+```
+
+> **Note:** As with `searchByText`, the result shape differs slightly between iOS and
+> Android. Read only the fields you need for cross-platform parity.
+
+#### Sample Implementation
+
+```ts
+import GooglePlacesSDK from 'react-native-google-places-sdk';
+
+GooglePlacesSDK.searchNearby(
+  { latitude: 18.922474, longitude: 72.831993, radius: 1000 }, // options
+  ['restaurant', 'cafe'] // includedTypes (optional)
+)
+  .then((places) => console.log(places))
+  .catch((error) => console.log(error));
+
 // ...
 ```
 
