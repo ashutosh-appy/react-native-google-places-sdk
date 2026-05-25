@@ -131,6 +131,15 @@ class GooglePlacesSdk: NSObject {
         if let coordinate = place.coordinate as CLLocationCoordinate2D? {
           dict["location"] = ["lat": coordinate.latitude, "lng": coordinate.longitude]
         }
+        if let components = place.addressComponents {
+          dict["addressComponents"] = components.map { component in
+            return [
+              "types": component.types,
+              "name": component.name,
+              "shortName": component.shortName ?? "",
+            ]
+          }
+        }
 
         return dict
       }
@@ -192,6 +201,15 @@ class GooglePlacesSdk: NSObject {
         dict["url"] = place.website ?? []
         if let coordinate = place.coordinate as CLLocationCoordinate2D? {
           dict["location"] = ["lat": coordinate.latitude, "lng": coordinate.longitude]
+        }
+        if let components = place.addressComponents {
+          dict["addressComponents"] = components.map { component in
+            return [
+              "types": component.types,
+              "name": component.name,
+              "shortName": component.shortName ?? "",
+            ]
+          }
         }
 
         return dict
