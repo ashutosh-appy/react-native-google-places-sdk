@@ -18,7 +18,7 @@ let NO_ACTIVE_SESSION = "NO_ACTIVE_SESSION";
 class GooglePlacesSdk: NSObject {
   private var client: GMSPlacesClient? = nil;
   private var sessionToken: GMSAutocompleteSessionToken? = nil;
-  
+
   @objc
   func initialize(_ apiKey: String) -> Void {
     DispatchQueue.main.async {
@@ -26,48 +26,48 @@ class GooglePlacesSdk: NSObject {
       self.client = GMSPlacesClient.shared()
     }
   }
-  
+
   @objc
   func startNewSession(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       guard let client = self.client else {
           reject("-1", NOT_INITIALIZED_MSG, NSError(domain: "", code: 0))
           return
       }
-      
+
       self.sessionToken = GMSAutocompleteSessionToken()
       resolve(NEW_SESSION_CREATED)
   }
-  
+
   @objc
   func clearSession(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       guard let _ = self.client else {
           reject("-1", NOT_INITIALIZED_MSG, NSError(domain: "", code: 0))
           return
       }
-    
+
       if self.sessionToken == nil {
           resolve(NO_ACTIVE_SESSION)
           return
       }
-      
+
       self.sessionToken = nil
       resolve(SESSION_CLEARED)
   }
-  
+
   @objc
   func fetchPredictions(_ query: String, filterOptions: NSDictionary,  resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     guard let client = self.client else {
       reject("-1", NOT_INITIALIZED_MSG, NSError(domain: "", code: 0))
       return
     }
-    
+
     // Use sessionToken if it exists, otherwise create a new one
     self.sessionToken = self.sessionToken ?? GMSAutocompleteSessionToken()
-    
+
     let request = GMSAutocompleteRequest(query: query)
     request.filter = AutocompleteFilterFromOptions(filterOptions)
     request.sessionToken = self.sessionToken
-        
+
     client.fetchAutocompleteSuggestions(from: request, callback: { ( results: Optional<Array<GMSAutocompleteSuggestion>>, error: Error? ) in
       guard let results = results, error == nil else {
         let errorCode = error?._code ?? 0
@@ -75,7 +75,7 @@ class GooglePlacesSdk: NSObject {
         reject(String(errorCode), errorMsg, error)
         return
       }
-      
+
       let parsedSuggestions = ParseSuggesttions(suggestions: results)
       resolve(parsedSuggestions)
     })
@@ -226,14 +226,17 @@ class GooglePlacesSdk: NSObject {
       reject("-1", NOT_INITIALIZED_MSG, NSError(domain: "", code: 0))
       return
     }
-    
-    let parsedFields = GMSPlaceFieldsFromFields(fields: fields)
-    let selectedFields: GMSPlaceField = parsedFields
-    
-    let myProperties = [GMSPlaceProperty.addressComponents, GMSPlaceProperty.name, GMSPlaceProperty.openingHours, GMSPlaceProperty.coordinate, GMSPlaceProperty.photos, GMSPlaceProperty.plusCode, GMSPlaceProperty.dineIn, GMSPlaceProperty.userRatingsTotal, GMSPlaceProperty.takeout, GMSPlaceProperty.priceLevel, GMSPlaceProperty.phoneNumber, GMSPlaceProperty.curbsidePickup, GMSPlaceProperty.types, GMSPlaceProperty.placeID, GMSPlaceProperty.businessStatus, GMSPlaceProperty.viewport, GMSPlaceProperty.rating, GMSPlaceProperty.delivery, GMSPlaceProperty.formattedAddress, GMSPlaceProperty.website].map {$0.rawValue}
-    
+
+    var myProperties: [String] = []
+
+    if let stringFields = fields as? [String], !stringFields.isEmpty {
+      myProperties = stringFields
+    } else {
+      myProperties = [GMSPlaceProperty.addressComponents, GMSPlaceProperty.name, GMSPlaceProperty.openingHours, GMSPlaceProperty.coordinate, GMSPlaceProperty.photos, GMSPlaceProperty.plusCode, GMSPlaceProperty.dineIn, GMSPlaceProperty.userRatingsTotal, GMSPlaceProperty.takeout, GMSPlaceProperty.priceLevel, GMSPlaceProperty.phoneNumber, GMSPlaceProperty.curbsidePickup, GMSPlaceProperty.types, GMSPlaceProperty.placeID, GMSPlaceProperty.businessStatus, GMSPlaceProperty.viewport, GMSPlaceProperty.rating, GMSPlaceProperty.delivery, GMSPlaceProperty.formattedAddress, GMSPlaceProperty.website].map {$0.rawValue}
+    }
+
     let fetchPlaceRequest = GMSFetchPlaceRequest(placeID: placeID, placeProperties: myProperties, sessionToken: self.sessionToken)
-    
+
     client.fetchPlace(with: fetchPlaceRequest, callback: {(place: GMSPlace?, error: Error?) in
       guard let place = place, error == nil else {
         let errorCode = error?._code ?? 0
@@ -244,9 +247,9 @@ class GooglePlacesSdk: NSObject {
 
       let parsedPlace = ParsePlace(place: place)
       resolve(parsedPlace)
-      
+
       self.sessionToken = nil
     })
-    
+
   }
 }
