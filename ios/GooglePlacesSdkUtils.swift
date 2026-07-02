@@ -283,3 +283,4 @@ func ParsePlace(place: GMSPlace) -> NSDictionary {
   if let photos = photos { result["photos"] = photos }
   
   return result as NSDictionary
+}
