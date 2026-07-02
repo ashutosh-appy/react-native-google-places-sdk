@@ -279,6 +279,65 @@ func ParsePlace(place: GMSPlace) -> NSDictionary {
   let curbsidePickup = ParseBooleanPlaceAttribute(val: place.curbsidePickup)
   if curbsidePickup != "UNKNOWN" { result["curbsidePickup"] = curbsidePickup }
   
+  let reservable = ParseBooleanPlaceAttribute(val: place.reservable)
+  if reservable != "UNKNOWN" { result["reservable"] = reservable }
+  
+  let servesBreakfast = ParseBooleanPlaceAttribute(val: place.servesBreakfast)
+  if servesBreakfast != "UNKNOWN" { result["servesBreakfast"] = servesBreakfast }
+  
+  let servesLunch = ParseBooleanPlaceAttribute(val: place.servesLunch)
+  if servesLunch != "UNKNOWN" { result["servesLunch"] = servesLunch }
+  
+  let servesDinner = ParseBooleanPlaceAttribute(val: place.servesDinner)
+  if servesDinner != "UNKNOWN" { result["servesDinner"] = servesDinner }
+  
+  let servesBeer = ParseBooleanPlaceAttribute(val: place.servesBeer)
+  if servesBeer != "UNKNOWN" { result["servesBeer"] = servesBeer }
+  
+  let servesWine = ParseBooleanPlaceAttribute(val: place.servesWine)
+  if servesWine != "UNKNOWN" { result["servesWine"] = servesWine }
+  
+  let servesBrunch = ParseBooleanPlaceAttribute(val: place.servesBrunch)
+  if servesBrunch != "UNKNOWN" { result["servesBrunch"] = servesBrunch }
+  
+  let servesVegetarianFood = ParseBooleanPlaceAttribute(val: place.servesVegetarianFood)
+  if servesVegetarianFood != "UNKNOWN" { result["servesVegetarianFood"] = servesVegetarianFood }
+  
+  let wheelchairAccessibleEntrance = ParseBooleanPlaceAttribute(val: place.wheelchairAccessibleEntrance)
+  if wheelchairAccessibleEntrance != "UNKNOWN" { result["wheelchairAccessibleEntrance"] = wheelchairAccessibleEntrance }
+  
+  if let currentOpeningHours = place.currentOpeningHours?.weekdayText { result["currentOpeningHours"] = currentOpeningHours }
+  
+  if let secondaryOpeningHours = place.secondaryOpeningHours { result["secondaryOpeningHours"] = String(describing: secondaryOpeningHours) }
+  
+  if let iconBackgroundColor = place.iconBackgroundColor {
+      var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+      iconBackgroundColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+      result["iconBackgroundColor"] = String(format: "#%02X%02X%02X", Int(r * 255.0), Int(g * 255.0), Int(b * 255.0))
+  }
+  
+  if let reviews = place.reviews {
+      let parsedReviews = reviews.compactMap { review -> [String: Any]? in
+          var rev: [String: Any] = [
+              "rating": review.rating,
+              "text": review.text ?? "",
+              "publishTime": review.publishDate.description
+          ]
+          if let author = review.authorAttribution {
+              rev["authorAttribution"] = [
+                  "name": author.name,
+                  "uri": author.uri ?? "",
+                  "photoUri": author.photoURI ?? ""
+              ]
+          }
+          if let relative = review.relativePublishDateDescription {
+              rev["relativePublishTimeDescription"] = relative
+          }
+          return rev
+      }
+      result["reviews"] = parsedReviews
+  }
+  
   if let attributions = place.attributions?.string { result["attributions"] = attributions }
   if let photos = photos { result["photos"] = photos }
   

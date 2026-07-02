@@ -33,6 +33,19 @@ class GooglePlacesSdkConstants {
     fieldMap.put("dineIn", Place.Field.DINE_IN);
     fieldMap.put("curbsidePickup", Place.Field.CURBSIDE_PICKUP);
     fieldMap.put("photos", Place.Field.PHOTO_METADATAS);
+    fieldMap.put("reservable", Place.Field.RESERVABLE);
+    fieldMap.put("servesBreakfast", Place.Field.SERVES_BREAKFAST);
+    fieldMap.put("servesLunch", Place.Field.SERVES_LUNCH);
+    fieldMap.put("servesDinner", Place.Field.SERVES_DINNER);
+    fieldMap.put("servesBeer", Place.Field.SERVES_BEER);
+    fieldMap.put("servesWine", Place.Field.SERVES_WINE);
+    fieldMap.put("servesBrunch", Place.Field.SERVES_BRUNCH);
+    fieldMap.put("servesVegetarianFood", Place.Field.SERVES_VEGETARIAN_FOOD);
+    fieldMap.put("wheelchairAccessibleEntrance", Place.Field.WHEELCHAIR_ACCESSIBLE_ENTRANCE);
+    fieldMap.put("reviews", Place.Field.REVIEWS);
+    fieldMap.put("currentOpeningHours", Place.Field.CURRENT_OPENING_HOURS);
+    fieldMap.put("secondaryOpeningHours", Place.Field.SECONDARY_OPENING_HOURS);
+    fieldMap.put("iconBackgroundColor", Place.Field.ICON_BACKGROUND_COLOR);
     
     return Collections.unmodifiableMap(fieldMap);
   }

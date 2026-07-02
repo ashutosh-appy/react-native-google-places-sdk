@@ -247,7 +247,20 @@ class GooglePlacesSdk: NSObject {
       "rating": GMSPlaceProperty.rating.rawValue,
       "delivery": GMSPlaceProperty.delivery.rawValue,
       "formattedAddress": GMSPlaceProperty.formattedAddress.rawValue,
-      "website": GMSPlaceProperty.website.rawValue
+      "website": GMSPlaceProperty.website.rawValue,
+      "reservable": GMSPlaceProperty.reservable.rawValue,
+      "servesBreakfast": GMSPlaceProperty.servesBreakfast.rawValue,
+      "servesLunch": GMSPlaceProperty.servesLunch.rawValue,
+      "servesDinner": GMSPlaceProperty.servesDinner.rawValue,
+      "servesBeer": GMSPlaceProperty.servesBeer.rawValue,
+      "servesWine": GMSPlaceProperty.servesWine.rawValue,
+      "servesBrunch": GMSPlaceProperty.servesBrunch.rawValue,
+      "servesVegetarianFood": GMSPlaceProperty.servesVegetarianFood.rawValue,
+      "wheelchairAccessibleEntrance": GMSPlaceProperty.wheelchairAccessibleEntrance.rawValue,
+      "reviews": GMSPlaceProperty.reviews.rawValue,
+      "currentOpeningHours": GMSPlaceProperty.currentOpeningHours.rawValue,
+      "secondaryOpeningHours": GMSPlaceProperty.secondaryOpeningHours.rawValue,
+      "iconBackgroundColor": GMSPlaceProperty.iconBackgroundColor.rawValue
     ]
     
     var myProperties: [String] = []

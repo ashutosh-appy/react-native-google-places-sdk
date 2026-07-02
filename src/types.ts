@@ -75,4 +75,27 @@ export type Place = {
     width: number;
     height: number;
   }[];
+  reservable: AtmosphereCategoryStatus;
+  servesBreakfast: AtmosphereCategoryStatus;
+  servesLunch: AtmosphereCategoryStatus;
+  servesDinner: AtmosphereCategoryStatus;
+  servesBeer: AtmosphereCategoryStatus;
+  servesWine: AtmosphereCategoryStatus;
+  servesBrunch: AtmosphereCategoryStatus;
+  servesVegetarianFood: AtmosphereCategoryStatus;
+  wheelchairAccessibleEntrance: AtmosphereCategoryStatus;
+  reviews: {
+    authorAttribution: {
+      name: string | null;
+      uri: string | null;
+      photoUri: string | null;
+    } | null;
+    rating: number;
+    text: string | null;
+    publishTime: string | null;
+    relativePublishTimeDescription: string | null;
+  }[] | null;
+  currentOpeningHours: string | null;
+  secondaryOpeningHours: string | null;
+  iconBackgroundColor: string | null;
 };

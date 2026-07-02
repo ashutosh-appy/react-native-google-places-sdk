@@ -22,6 +22,8 @@ import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlusCode;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.Review;
+import com.google.android.libraries.places.api.model.AuthorAttribution;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.SearchByTextRequest;
 import com.google.android.libraries.places.api.net.SearchNearbyRequest;
@@ -297,6 +299,29 @@ class GooglePlacesSdkUtils {
     return map;
   }
 
+  static WritableArray ParseReviews(List<Review> reviews) {
+    WritableArray parsedReviews = Arguments.createArray();
+    for (Review review : reviews) {
+      WritableMap reviewMap = Arguments.createMap();
+      if (review.getAuthorAttribution() != null) {
+        WritableMap authorMap = Arguments.createMap();
+        AuthorAttribution attribution = review.getAuthorAttribution();
+        authorMap.putString("name", attribution.getName());
+        authorMap.putString("uri", attribution.getUri());
+        authorMap.putString("photoUri", attribution.getPhotoUri());
+        reviewMap.putMap("authorAttribution", authorMap);
+      }
+      
+      reviewMap.putDouble("rating", review.getRating());
+      if (review.getText() != null) reviewMap.putString("text", review.getText());
+      if (review.getPublishTime() != null) reviewMap.putString("publishTime", review.getPublishTime());
+      if (review.getRelativePublishTimeDescription() != null) reviewMap.putString("relativePublishTimeDescription", review.getRelativePublishTimeDescription());
+      
+      parsedReviews.pushMap(reviewMap);
+    }
+    return parsedReviews;
+  }
+
   static WritableMap ParsePlace(Place place) {
     WritableMap placeInfo = Arguments.createMap();
 
@@ -311,6 +336,32 @@ class GooglePlacesSdkUtils {
     if (place.getDelivery() != null && !place.getDelivery().toString().equals("UNKNOWN")) placeInfo.putString("delivery", place.getDelivery().toString());
     if (place.getDineIn() != null && !place.getDineIn().toString().equals("UNKNOWN")) placeInfo.putString("dineIn", place.getDineIn().toString());
     if (place.getCurbsidePickup() != null && !place.getCurbsidePickup().toString().equals("UNKNOWN")) placeInfo.putString("curbsidePickup", place.getCurbsidePickup().toString());
+
+    if (place.getReservable() != null && !place.getReservable().toString().equals("UNKNOWN")) placeInfo.putString("reservable", place.getReservable().toString());
+    if (place.getServesBreakfast() != null && !place.getServesBreakfast().toString().equals("UNKNOWN")) placeInfo.putString("servesBreakfast", place.getServesBreakfast().toString());
+    if (place.getServesLunch() != null && !place.getServesLunch().toString().equals("UNKNOWN")) placeInfo.putString("servesLunch", place.getServesLunch().toString());
+    if (place.getServesDinner() != null && !place.getServesDinner().toString().equals("UNKNOWN")) placeInfo.putString("servesDinner", place.getServesDinner().toString());
+    if (place.getServesBeer() != null && !place.getServesBeer().toString().equals("UNKNOWN")) placeInfo.putString("servesBeer", place.getServesBeer().toString());
+    if (place.getServesWine() != null && !place.getServesWine().toString().equals("UNKNOWN")) placeInfo.putString("servesWine", place.getServesWine().toString());
+    if (place.getServesBrunch() != null && !place.getServesBrunch().toString().equals("UNKNOWN")) placeInfo.putString("servesBrunch", place.getServesBrunch().toString());
+    if (place.getServesVegetarianFood() != null && !place.getServesVegetarianFood().toString().equals("UNKNOWN")) placeInfo.putString("servesVegetarianFood", place.getServesVegetarianFood().toString());
+    if (place.getWheelchairAccessibleEntrance() != null && !place.getWheelchairAccessibleEntrance().toString().equals("UNKNOWN")) placeInfo.putString("wheelchairAccessibleEntrance", place.getWheelchairAccessibleEntrance().toString());
+
+    if (place.getReviews() != null) {
+      placeInfo.putArray("reviews", ParseReviews(place.getReviews()));
+    }
+
+    if (place.getCurrentOpeningHours() != null && place.getCurrentOpeningHours().getWeekdayText() != null) {
+      placeInfo.putString("currentOpeningHours", place.getCurrentOpeningHours().getWeekdayText().toString());
+    }
+
+    if (place.getSecondaryOpeningHours() != null) {
+      placeInfo.putString("secondaryOpeningHours", place.getSecondaryOpeningHours().toString());
+    }
+
+    if (place.getIconBackgroundColor() != null) {
+      placeInfo.putString("iconBackgroundColor", String.format("#%06X", (0xFFFFFF & place.getIconBackgroundColor())));
+    }
 
     if (place.getPhotoMetadatas() != null) {
       placeInfo.putArray("photos", ParsePhotos(place.getPhotoMetadatas()));
@@ -340,7 +391,7 @@ class GooglePlacesSdkUtils {
       placeInfo.putInt("priceLevel", place.getPriceLevel());
     }
 
-    if (place.getOpeningHours() != null) {
+    if (place.getOpeningHours() != null && place.getOpeningHours().getWeekdayText() != null) {
       placeInfo.putString("openingHours", place.getOpeningHours().getWeekdayText().toString());
     }
 
@@ -360,8 +411,8 @@ class GooglePlacesSdkUtils {
     LatLngBounds viewport = place.getViewport();
     if (viewport != null) {
       WritableMap viewportMap = Arguments.createMap();
-      viewportMap.putMap("northEast", ParseLatLng(viewport.northeast));
-      viewportMap.putMap("southWest", ParseLatLng(viewport.southwest));
+      if (viewport.northeast != null) viewportMap.putMap("northEast", ParseLatLng(viewport.northeast));
+      if (viewport.southwest != null) viewportMap.putMap("southWest", ParseLatLng(viewport.southwest));
       placeInfo.putMap("viewport", viewportMap);
     }
 
