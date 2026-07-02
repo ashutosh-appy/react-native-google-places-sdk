@@ -239,29 +239,47 @@ func ParsePlace(place: GMSPlace) -> NSDictionary {
   ]
   
   
-  return [
-    "name": place.name ?? NSNull(),
-    "placeID": place.placeID ?? NSNull(),
-    "plusCode": plusCode ?? NSNull(),
-    "coordinate": coordinate,
-    "openingHours": place.openingHours?.weekdayText ?? NSNull(),
-    "phoneNumber": place.phoneNumber ?? "",
-    "types": place.types ?? NSNull(),
-    "priceLevel": place.priceLevel,
-    "website": place.website?.absoluteString ?? NSNull(),
-    "viewport": viewport ??  NSNull(),
-    "formattedAddress": place.formattedAddress ?? NSNull(),
-    "addressComponents": addressComponents ?? NSNull(),
-    "rating": place.rating,
-    "userRatingsTotal": place.userRatingsTotal,
-    "utcOffsetMinutes": place.utcOffsetMinutes ?? NSNull(),
-    "businessStatus": ParseBusinessStatus(val: place.businessStatus),
-    "iconImageURL": place.iconImageURL?.absoluteString ?? NSNull(),
-    "takeout": ParseBooleanPlaceAttribute(val: place.takeout),
-    "delivery": ParseBooleanPlaceAttribute(val: place.delivery),
-    "dineIn": ParseBooleanPlaceAttribute(val: place.dineIn),
-    "curbsidePickup": ParseBooleanPlaceAttribute(val: place.curbsidePickup),
-    "attributions": place.attributions?.string ?? NSNull(),
-    "photos": photos ?? NSNull(),
-  ]
-}
+  var result = [String: Any]()
+  if let name = place.name { result["name"] = name }
+  if let placeID = place.placeID { result["placeID"] = placeID }
+  if let plusCode = plusCode { result["plusCode"] = plusCode }
+  
+  if place.coordinate.latitude != -180.0 || place.coordinate.longitude != -180.0 {
+      result["coordinate"] = coordinate
+  }
+  
+  if let openingHours = place.openingHours?.weekdayText { result["openingHours"] = openingHours }
+  if let phoneNumber = place.phoneNumber, !phoneNumber.isEmpty { result["phoneNumber"] = phoneNumber }
+  if let types = place.types { result["types"] = types }
+  
+  if place.priceLevel != .unknown { result["priceLevel"] = place.priceLevel.rawValue }
+  if let website = place.website?.absoluteString { result["website"] = website }
+  if let viewport = viewport { result["viewport"] = viewport }
+  if let formattedAddress = place.formattedAddress { result["formattedAddress"] = formattedAddress }
+  if let addressComponents = addressComponents { result["addressComponents"] = addressComponents }
+  
+  if place.rating > 0 { result["rating"] = place.rating }
+  if place.userRatingsTotal > 0 { result["userRatingsTotal"] = place.userRatingsTotal }
+  if let utcOffset = place.utcOffsetMinutes { result["utcOffsetMinutes"] = utcOffset }
+  
+  let businessStatus = ParseBusinessStatus(val: place.businessStatus)
+  if businessStatus != "UNKNOWN" { result["businessStatus"] = businessStatus }
+  
+  if let iconImageURL = place.iconImageURL?.absoluteString { result["iconImageURL"] = iconImageURL }
+  
+  let takeout = ParseBooleanPlaceAttribute(val: place.takeout)
+  if takeout != "UNKNOWN" { result["takeout"] = takeout }
+  
+  let delivery = ParseBooleanPlaceAttribute(val: place.delivery)
+  if delivery != "UNKNOWN" { result["delivery"] = delivery }
+  
+  let dineIn = ParseBooleanPlaceAttribute(val: place.dineIn)
+  if dineIn != "UNKNOWN" { result["dineIn"] = dineIn }
+  
+  let curbsidePickup = ParseBooleanPlaceAttribute(val: place.curbsidePickup)
+  if curbsidePickup != "UNKNOWN" { result["curbsidePickup"] = curbsidePickup }
+  
+  if let attributions = place.attributions?.string { result["attributions"] = attributions }
+  if let photos = photos { result["photos"] = photos }
+  
+  return result as NSDictionary

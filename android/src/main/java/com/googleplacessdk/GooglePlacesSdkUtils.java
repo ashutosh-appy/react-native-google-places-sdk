@@ -300,54 +300,53 @@ class GooglePlacesSdkUtils {
   static WritableMap ParsePlace(Place place) {
     WritableMap placeInfo = Arguments.createMap();
 
-    placeInfo.putString("name", place.getName());
-    placeInfo.putString("placeID", place.getId());
-    placeInfo.putString("phoneNumber", place.getPhoneNumber());
-    placeInfo.putString("formattedAddress", place.getAddress());
-    placeInfo.putString(
-      "businessStatus",
-      place.getBusinessStatus() != null ? place.getBusinessStatus().toString() : "UNKNOWN"
-    );
-    placeInfo.putString("takeout", place.getTakeout().toString());
-    placeInfo.putString("delivery", place.getDelivery().toString());
-    placeInfo.putString("dineIn", place.getDineIn().toString());
-    placeInfo.putString("curbsidePickup", place.getCurbsidePickup().toString());
+    if (place.getName() != null) placeInfo.putString("name", place.getName());
+    if (place.getId() != null) placeInfo.putString("placeID", place.getId());
+    if (place.getPhoneNumber() != null) placeInfo.putString("phoneNumber", place.getPhoneNumber());
+    if (place.getAddress() != null) placeInfo.putString("formattedAddress", place.getAddress());
+    if (place.getBusinessStatus() != null && !place.getBusinessStatus().toString().equals("UNKNOWN")) {
+      placeInfo.putString("businessStatus", place.getBusinessStatus().toString());
+    }
+    if (place.getTakeout() != null && !place.getTakeout().toString().equals("UNKNOWN")) placeInfo.putString("takeout", place.getTakeout().toString());
+    if (place.getDelivery() != null && !place.getDelivery().toString().equals("UNKNOWN")) placeInfo.putString("delivery", place.getDelivery().toString());
+    if (place.getDineIn() != null && !place.getDineIn().toString().equals("UNKNOWN")) placeInfo.putString("dineIn", place.getDineIn().toString());
+    if (place.getCurbsidePickup() != null && !place.getCurbsidePickup().toString().equals("UNKNOWN")) placeInfo.putString("curbsidePickup", place.getCurbsidePickup().toString());
 
     if (place.getPhotoMetadatas() != null) {
       placeInfo.putArray("photos", ParsePhotos(place.getPhotoMetadatas()));
-    } else placeInfo.putNull("photos");
+    }
 
     if (place.getAttributions() != null) {
       placeInfo.putString("attributions", place.getAttributions().toString());
-    } else placeInfo.putNull("attributions");
+    }
 
     if (place.getPlusCode() != null) {
       placeInfo.putMap("plusCode", ParsePlusCode(place.getPlusCode()));
-    } else placeInfo.putNull("plusCode");
+    }
 
     if (place.getWebsiteUri() != null) {
       placeInfo.putString("website", place.getWebsiteUri().toString());
-    } else placeInfo.putNull("website");
+    }
 
     if (place.getRating() != null) {
       placeInfo.putDouble("rating", place.getRating());
-    } else placeInfo.putNull("rating");
+    }
 
     if (place.getUserRatingsTotal() != null) {
       placeInfo.putInt("userRatingsTotal", place.getUserRatingsTotal());
-    } else placeInfo.putNull("userRatingsTotal");
+    }
 
     if (place.getPriceLevel() != null) {
       placeInfo.putInt("priceLevel", place.getPriceLevel());
-    } else placeInfo.putNull("priceLevel");
+    }
 
     if (place.getOpeningHours() != null) {
       placeInfo.putString("openingHours", place.getOpeningHours().getWeekdayText().toString());
-    } else placeInfo.putNull("openingHours");
+    }
 
     if (place.getTypes() != null) {
       placeInfo.putArray("types", ParsePlaceTypes(place.getTypes()));
-    } else placeInfo.putNull("types");
+    }
 
     if (place.getAddressComponents() != null) {
       placeInfo.putArray("addressComponents", ParseAddressComponents(place.getAddressComponents()));
@@ -356,7 +355,7 @@ class GooglePlacesSdkUtils {
     if (place.getLatLng() != null) {
       WritableMap coordinate = ParseLatLng(place.getLatLng());
       placeInfo.putMap("coordinate", coordinate);
-    } else placeInfo.putNull("coordinate");
+    }
 
     LatLngBounds viewport = place.getViewport();
     if (viewport != null) {
@@ -364,7 +363,7 @@ class GooglePlacesSdkUtils {
       viewportMap.putMap("northEast", ParseLatLng(viewport.northeast));
       viewportMap.putMap("southWest", ParseLatLng(viewport.southwest));
       placeInfo.putMap("viewport", viewportMap);
-    } else placeInfo.putNull("viewport");
+    }
 
     return placeInfo;
   }

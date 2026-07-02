@@ -227,12 +227,40 @@ class GooglePlacesSdk: NSObject {
       return
     }
 
+    let propertyMap: [String: String] = [
+      "addressComponents": GMSPlaceProperty.addressComponents.rawValue,
+      "name": GMSPlaceProperty.name.rawValue,
+      "openingHours": GMSPlaceProperty.openingHours.rawValue,
+      "coordinate": GMSPlaceProperty.coordinate.rawValue,
+      "photos": GMSPlaceProperty.photos.rawValue,
+      "plusCode": GMSPlaceProperty.plusCode.rawValue,
+      "dineIn": GMSPlaceProperty.dineIn.rawValue,
+      "userRatingsTotal": GMSPlaceProperty.userRatingsTotal.rawValue,
+      "takeout": GMSPlaceProperty.takeout.rawValue,
+      "priceLevel": GMSPlaceProperty.priceLevel.rawValue,
+      "phoneNumber": GMSPlaceProperty.phoneNumber.rawValue,
+      "curbsidePickup": GMSPlaceProperty.curbsidePickup.rawValue,
+      "types": GMSPlaceProperty.types.rawValue,
+      "placeID": GMSPlaceProperty.placeID.rawValue,
+      "businessStatus": GMSPlaceProperty.businessStatus.rawValue,
+      "viewport": GMSPlaceProperty.viewport.rawValue,
+      "rating": GMSPlaceProperty.rating.rawValue,
+      "delivery": GMSPlaceProperty.delivery.rawValue,
+      "formattedAddress": GMSPlaceProperty.formattedAddress.rawValue,
+      "website": GMSPlaceProperty.website.rawValue
+    ]
+    
     var myProperties: [String] = []
-
     if let stringFields = fields as? [String], !stringFields.isEmpty {
-      myProperties = stringFields
-    } else {
-      myProperties = [GMSPlaceProperty.addressComponents, GMSPlaceProperty.name, GMSPlaceProperty.openingHours, GMSPlaceProperty.coordinate, GMSPlaceProperty.photos, GMSPlaceProperty.plusCode, GMSPlaceProperty.dineIn, GMSPlaceProperty.userRatingsTotal, GMSPlaceProperty.takeout, GMSPlaceProperty.priceLevel, GMSPlaceProperty.phoneNumber, GMSPlaceProperty.curbsidePickup, GMSPlaceProperty.types, GMSPlaceProperty.placeID, GMSPlaceProperty.businessStatus, GMSPlaceProperty.viewport, GMSPlaceProperty.rating, GMSPlaceProperty.delivery, GMSPlaceProperty.formattedAddress, GMSPlaceProperty.website].map {$0.rawValue}
+      for field in stringFields {
+        if let prop = propertyMap[field] {
+          myProperties.append(prop)
+        }
+      }
+    }
+    
+    if myProperties.isEmpty {
+      myProperties = Array(propertyMap.values)
     }
 
     let fetchPlaceRequest = GMSFetchPlaceRequest(placeID: placeID, placeProperties: myProperties, sessionToken: self.sessionToken)
